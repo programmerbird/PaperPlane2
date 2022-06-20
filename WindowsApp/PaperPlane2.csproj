@@ -8,6 +8,12 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationIcon>AppIcon.ico</ApplicationIcon>
     <PackageIcon>AppIcon.png</PackageIcon>
+    <Description>Simple windows app for split, merge and rotate PDF files.</Description>
+    <PackageProjectUrl>https://github.com/programmerbird/Paperplane2</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/programmerbird/Paperplane2</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>pdf,merge,rotate,split</PackageTags>
+    <PackageLicenseFile>C:\Users\Sittipon\Projects\PaperPlane2\LICENSE</PackageLicenseFile>
   </PropertyGroup>
 
   <ItemGroup>
