@@ -51,20 +51,24 @@
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.rotateLeftToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.rotateRightToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.zoomInToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.zoomOutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.listView1 = new System.Windows.Forms.ListView();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.emptyPanel = new System.Windows.Forms.Panel();
             this.emptyContainer = new System.Windows.Forms.Panel();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.button1 = new System.Windows.Forms.Button();
+            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.webView1 = new Microsoft.Web.WebView2.WinForms.WebView2();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.menuStrip1.SuspendLayout();
             this.emptyPanel.SuspendLayout();
             this.emptyContainer.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
+            this.splitContainer1.Panel1.SuspendLayout();
+            this.splitContainer1.Panel2.SuspendLayout();
+            this.splitContainer1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.webView1)).BeginInit();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -72,8 +76,7 @@
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
             this.editToolStripMenuItem1,
-            this.editToolStripMenuItem,
-            this.viewToolStripMenuItem});
+            this.editToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(800, 24);
@@ -271,52 +274,23 @@
             this.rotateRightToolStripMenuItem.Text = "Rotate Right";
             this.rotateRightToolStripMenuItem.Click += new System.EventHandler(this.rotateRightToolStripMenuItem_Click);
             // 
-            // viewToolStripMenuItem
-            // 
-            this.viewToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.zoomInToolStripMenuItem,
-            this.zoomOutToolStripMenuItem});
-            this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
-            this.viewToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
-            this.viewToolStripMenuItem.Text = "&View";
-            // 
-            // zoomInToolStripMenuItem
-            // 
-            this.zoomInToolStripMenuItem.Enabled = false;
-            this.zoomInToolStripMenuItem.Name = "zoomInToolStripMenuItem";
-            this.zoomInToolStripMenuItem.ShortcutKeyDisplayString = "Ctrl++";
-            this.zoomInToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Oemplus)));
-            this.zoomInToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
-            this.zoomInToolStripMenuItem.Text = "Zoom In";
-            this.zoomInToolStripMenuItem.Click += new System.EventHandler(this.zoomInToolStripMenuItem_Click);
-            // 
-            // zoomOutToolStripMenuItem
-            // 
-            this.zoomOutToolStripMenuItem.Enabled = false;
-            this.zoomOutToolStripMenuItem.Name = "zoomOutToolStripMenuItem";
-            this.zoomOutToolStripMenuItem.ShortcutKeyDisplayString = "Ctrl+-";
-            this.zoomOutToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.OemMinus)));
-            this.zoomOutToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
-            this.zoomOutToolStripMenuItem.Text = "Zoom Out";
-            this.zoomOutToolStripMenuItem.Click += new System.EventHandler(this.zoomOutToolStripMenuItem_Click);
-            // 
             // listView1
             // 
             this.listView1.AllowDrop = true;
             this.listView1.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.listView1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.listView1.GridLines = true;
-            this.listView1.Location = new System.Drawing.Point(0, 24);
+            this.listView1.Location = new System.Drawing.Point(0, 0);
             this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(800, 426);
+            this.listView1.Size = new System.Drawing.Size(266, 423);
             this.listView1.TabIndex = 2;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.listView1_ItemDrag);
             this.listView1.SelectedIndexChanged += new System.EventHandler(this.listView1_SelectedIndexChanged);
-            this.listView1.DragDrop += new System.Windows.Forms.DragEventHandler(this.listView1_DragDrop);
-            this.listView1.DragEnter += new System.Windows.Forms.DragEventHandler(this.listView1_DragEnter);
-            this.listView1.DragOver += new System.Windows.Forms.DragEventHandler(this.listView1_DragOver);
-            this.listView1.DragLeave += new System.EventHandler(this.listView1_DragLeave);
+            this.listView1.DragDrop += new System.Windows.Forms.DragEventHandler(this.MainForm_DragDrop);
+            this.listView1.DragEnter += new System.Windows.Forms.DragEventHandler(this.MainForm_DragEnter);
+            this.listView1.DragOver += new System.Windows.Forms.DragEventHandler(this.MainForm_DragOver);
+            this.listView1.DragLeave += new System.EventHandler(this.MainForm_DragLeave);
             // 
             // backgroundWorker1
             // 
@@ -329,13 +303,13 @@
             this.emptyPanel.AllowDrop = true;
             this.emptyPanel.Controls.Add(this.emptyContainer);
             this.emptyPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.emptyPanel.Location = new System.Drawing.Point(0, 24);
+            this.emptyPanel.Location = new System.Drawing.Point(0, 0);
             this.emptyPanel.Name = "emptyPanel";
-            this.emptyPanel.Size = new System.Drawing.Size(800, 426);
+            this.emptyPanel.Size = new System.Drawing.Size(800, 450);
             this.emptyPanel.TabIndex = 3;
-            this.emptyPanel.DragDrop += new System.Windows.Forms.DragEventHandler(this.listView1_DragDrop);
-            this.emptyPanel.DragEnter += new System.Windows.Forms.DragEventHandler(this.listView1_DragEnter);
-            this.emptyPanel.DragOver += new System.Windows.Forms.DragEventHandler(this.listView1_DragOver);
+            this.emptyPanel.DragDrop += new System.Windows.Forms.DragEventHandler(this.MainForm_DragDrop);
+            this.emptyPanel.DragEnter += new System.Windows.Forms.DragEventHandler(this.MainForm_DragEnter);
+            this.emptyPanel.DragOver += new System.Windows.Forms.DragEventHandler(this.MainForm_DragOver);
             // 
             // emptyContainer
             // 
@@ -346,9 +320,9 @@
             this.emptyContainer.Name = "emptyContainer";
             this.emptyContainer.Size = new System.Drawing.Size(341, 291);
             this.emptyContainer.TabIndex = 3;
-            this.emptyContainer.DragDrop += new System.Windows.Forms.DragEventHandler(this.listView1_DragDrop);
-            this.emptyContainer.DragEnter += new System.Windows.Forms.DragEventHandler(this.listView1_DragEnter);
-            this.emptyContainer.DragOver += new System.Windows.Forms.DragEventHandler(this.listView1_DragOver);
+            this.emptyContainer.DragDrop += new System.Windows.Forms.DragEventHandler(this.MainForm_DragDrop);
+            this.emptyContainer.DragEnter += new System.Windows.Forms.DragEventHandler(this.MainForm_DragEnter);
+            this.emptyContainer.DragOver += new System.Windows.Forms.DragEventHandler(this.MainForm_DragOver);
             // 
             // pictureBox1
             // 
@@ -370,7 +344,42 @@
             this.button1.TabIndex = 3;
             this.button1.Text = "Open Files";
             this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.button1.Click += new System.EventHandler(this.openButtonInEmptyPanel_Click);
+            // 
+            // splitContainer1
+            // 
+            this.splitContainer1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.splitContainer1.Location = new System.Drawing.Point(0, 25);
+            this.splitContainer1.Name = "splitContainer1";
+            // 
+            // splitContainer1.Panel1
+            // 
+            this.splitContainer1.Panel1.Controls.Add(this.listView1);
+            // 
+            // splitContainer1.Panel2
+            // 
+            this.splitContainer1.Panel2.Controls.Add(this.webView1);
+            this.splitContainer1.Size = new System.Drawing.Size(800, 423);
+            this.splitContainer1.SplitterDistance = 266;
+            this.splitContainer1.TabIndex = 4;
+            this.splitContainer1.Visible = false;
+            this.splitContainer1.SplitterMoved += new System.Windows.Forms.SplitterEventHandler(this.splitContainer1_SplitterMoved);
+            // 
+            // webView1
+            // 
+            this.webView1.AllowExternalDrop = true;
+            this.webView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.webView1.CreationProperties = null;
+            this.webView1.DefaultBackgroundColor = System.Drawing.Color.White;
+            this.webView1.Location = new System.Drawing.Point(0, -40);
+            this.webView1.Name = "webView1";
+            this.webView1.Size = new System.Drawing.Size(530, 463);
+            this.webView1.TabIndex = 0;
+            this.webView1.ZoomFactor = 1D;
             // 
             // progressBar1
             // 
@@ -388,24 +397,29 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.progressBar1);
-            this.Controls.Add(this.emptyPanel);
-            this.Controls.Add(this.listView1);
             this.Controls.Add(this.menuStrip1);
+            this.Controls.Add(this.splitContainer1);
+            this.Controls.Add(this.emptyPanel);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "MainForm";
             this.Text = "Paper Plane";
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.ResizeEnd += new System.EventHandler(this.MainForm_ResizeEnd);
-            this.DragDrop += new System.Windows.Forms.DragEventHandler(this.listView1_DragDrop);
-            this.DragEnter += new System.Windows.Forms.DragEventHandler(this.listView1_DragEnter);
-            this.DragOver += new System.Windows.Forms.DragEventHandler(this.listView1_DragOver);
-            this.Resize += new System.EventHandler(this.MainForm_ResizeEnd);
+            this.DragDrop += new System.Windows.Forms.DragEventHandler(this.MainForm_DragDrop);
+            this.DragEnter += new System.Windows.Forms.DragEventHandler(this.MainForm_DragEnter);
+            this.DragOver += new System.Windows.Forms.DragEventHandler(this.MainForm_DragOver);
+            this.Resize += new System.EventHandler(this.MainForm_Resize);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.emptyPanel.ResumeLayout(false);
             this.emptyContainer.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            this.splitContainer1.Panel1.ResumeLayout(false);
+            this.splitContainer1.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
+            this.splitContainer1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.webView1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -441,8 +455,7 @@
         private PictureBox pictureBox1;
         private Button button1;
         private ProgressBar progressBar1;
-        private ToolStripMenuItem viewToolStripMenuItem;
-        private ToolStripMenuItem zoomInToolStripMenuItem;
-        private ToolStripMenuItem zoomOutToolStripMenuItem;
+        private SplitContainer splitContainer1;
+        private Microsoft.Web.WebView2.WinForms.WebView2 webView1;
     }
 }

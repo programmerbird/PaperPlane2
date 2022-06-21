@@ -73,7 +73,9 @@ namespace PaperPlane2
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-           // ExecuteAction(new OpenDocumentAction("C:\\Users\\Sittipon\\Projects\\PaperPlane2\\Assets\\Test.pdf"));
+            splitContainer1.SplitterDistance = Properties.Settings.Default.SplitterDistance;
+
+            // ExecuteAction(new OpenDocumentAction("C:\\Users\\Sittipon\\Projects\\PaperPlane2\\Assets\\Test.pdf"));
         }
 
 
@@ -97,7 +99,7 @@ namespace PaperPlane2
         private const int MIN_THUMBNAIL_SIZE = 64;
         private void ReloadThumbnailsInBackground() {
 
-            var thumbnailSize = Properties.Settings.Default.Zoom;
+            int thumbnailSize = (splitContainer1.SplitterDistance - 20) * 8 / 10;
             if (thumbnailSize > MAX_THUMBNAIL_SIZE) {
                 thumbnailSize = MAX_THUMBNAIL_SIZE;
             }
@@ -161,23 +163,32 @@ namespace PaperPlane2
         }
         private void SetImageList(ImageList imageList, List<PDFDocument> pages) {
 
-            var selectedPages = ListSelectedPages();
+            this.isReloadingListView += 1;
+            try
+            {
+                var selectedPages = ListSelectedPages();
 
-            listView1.Clear();
-            listView1.LargeImageList = imageList;
+                listView1.Clear();
+                listView1.LargeImageList = imageList;
 
-            int pageIndex = 0;
-            foreach (var page in pages) {
+                int pageIndex = 0;
+                foreach (var page in pages)
+                {
 
-                var itemView = new ListViewItem();
-                itemView.Text = String.Format("{0}", pageIndex + 1);
-                itemView.ImageKey = page.FileName;
-                listView1.Items.Add(itemView);
+                    var itemView = new ListViewItem();
+                    itemView.Text = String.Format("{0}", pageIndex + 1);
+                    itemView.ImageKey = page.FileName;
+                    listView1.Items.Add(itemView);
 
-                if (selectedPages.Contains(page)) {
-                    itemView.Selected = true;
+                    if (selectedPages.Contains(page))
+                    {
+                        itemView.Selected = true;
+                    }
+                    pageIndex += 1;
                 }
-                pageIndex += 1;
+            }
+            finally {
+                this.isReloadingListView -= 1;
             }
         }
         private void undoToolStripMenuItem_Click(object sender, EventArgs e)
@@ -191,10 +202,67 @@ namespace PaperPlane2
             Redo();
         }
 
+        private int isReloadingListView = 0;
         private void listView1_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if (isReloadingListView > 0) {
+                return;
+            }
 
             ReloadHasSelectedPages();
+            ReloadPagePreview();
+        }
+
+        private bool ShowPagePreview(string? fileName) {
+            if (string.IsNullOrEmpty(fileName)) {
+                webView1.Visible = false;
+                return true;
+            }
+
+            try {
+                webView1.Visible = true;
+                var url = new Uri(string.Format("file://{0}", fileName));
+                if (webView1.Source == url)
+                {
+                    webView1.Reload();
+                }
+                else {
+                    webView1.Source = url;
+                }
+                return true;
+            }
+            catch{ 
+            }
+
+            return false;
+        }
+
+        public void ReloadPagePreview() {
+
+
+            var firstPage = GetFirstSelectedPage();
+            if (firstPage != null) {
+                if (ShowPagePreview(firstPage.FileName)) {
+                    return;
+                }
+            }
+
+
+            if (Workspace.Document == null) {
+                ShowPagePreview(null);
+                return;
+            }
+
+            var pages = Workspace.ListDocumentPages();
+            if (pages != null) {
+                foreach (var page in pages) {
+                    if (ShowPagePreview(page.FileName)) {
+                        return;
+                    }
+                }
+            }
+
+            ShowPagePreview(null);
         }
 
         public void ReloadHasSelectedPages() {
@@ -215,20 +283,19 @@ namespace PaperPlane2
 
         public void ReloadHasDocument()
         {
-
-
             bool hasDocument = Workspace.Document != null;
 
             saveToolStripMenuItem.Enabled = hasDocument;
             saveAsToolStripMenuItem.Enabled = hasDocument;
             closeDocumentToolStripMenuItem.Enabled = hasDocument;
             selectAllToolStripMenuItem.Enabled = hasDocument;
-            zoomInToolStripMenuItem.Enabled = hasDocument;
-            zoomOutToolStripMenuItem.Enabled = hasDocument;
 
+            listView1.Visible = hasDocument;
+            webView1.Visible = hasDocument;
+            splitContainer1.Visible = hasDocument;
             emptyPanel.Visible = !hasDocument;
         }
-
+        
         public List<PDFDocument> ListSelectedPages() {
             var pages = new List<PDFDocument>();
 
@@ -241,12 +308,22 @@ namespace PaperPlane2
             return pages;
         }
 
+        public PDFDocument? GetFirstSelectedPage()
+        {
+            foreach (ListViewItem item in listView1.SelectedItems) {
+                var page = Workspace.GetDocumentPage(item.Index);
+                if (page != null) {
+                    return page;
+                }
+            }
+            return null;
+        }
+
 
         public int GetLastSelectedPageIndex()
         {
             int lastIndex = -1;
-            foreach (ListViewItem item in listView1.SelectedItems)
-            {
+            foreach (ListViewItem item in listView1.SelectedItems) {
                 if (lastIndex < item.Index) {
                     lastIndex = item.Index;
                 }
@@ -319,7 +396,7 @@ namespace PaperPlane2
 
             ExecuteAction(new OpenDocumentAction(openFileDialog.FileName));
         }
-        private void button1_Click(object sender, EventArgs e)
+        private void openButtonInEmptyPanel_Click(object sender, EventArgs e)
         {
             BrowseDocumentToOpen();
         }
@@ -382,7 +459,7 @@ namespace PaperPlane2
             DoDragDrop(doc, DragDropEffects.Move);
         }
 
-        private void listView1_DragEnter(object sender, DragEventArgs e)
+        private void MainForm_DragEnter(object sender, DragEventArgs e)
         {
             var data = e.Data;
             if (data == null) {
@@ -429,7 +506,7 @@ namespace PaperPlane2
             return targetIndex;
         }
 
-        private void listView1_DragDrop(object sender, DragEventArgs e)
+        private void MainForm_DragDrop(object sender, DragEventArgs e)
         {
             var data = e.Data;
             if (data == null) {
@@ -468,7 +545,7 @@ namespace PaperPlane2
 
         }
 
-        private void listView1_DragOver(object sender, DragEventArgs e)
+        private void MainForm_DragOver(object sender, DragEventArgs e)
         {
 
             // Retrieve the client coordinates of the mouse pointer.
@@ -501,7 +578,7 @@ namespace PaperPlane2
             listView1.InsertionMark.Index = targetIndex;
         }
 
-        private void listView1_DragLeave(object sender, EventArgs e)
+        private void MainForm_DragLeave(object sender, EventArgs e)
         {
 
             listView1.InsertionMark.Index = -1;
@@ -609,10 +686,21 @@ namespace PaperPlane2
         }
 
 
-        private void MainForm_ResizeEnd(object sender, EventArgs e)
+        private bool isResizing = false;
+        private void MainForm_Resize(object sender, EventArgs e)
         {
+            isResizing = true;
             emptyContainer.Top = (emptyPanel.Height - emptyContainer.Height) / 2;
             emptyContainer.Left = (emptyPanel.Width - emptyContainer.Width) / 2;
+
+            splitContainer1.SplitterDistance = Properties.Settings.Default.SplitterDistance;
+
+        }
+        private void MainForm_ResizeEnd(object sender, EventArgs e)
+        {
+            isResizing = false;
+            ReloadDocumentThumbnails();
+
         }
 
         private void backgroundWorker1_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e)
@@ -628,39 +716,24 @@ namespace PaperPlane2
             }
         }
 
-        private void zoomInToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            int zoom = Properties.Settings.Default.Zoom;
-            zoom += 32;
-            if (zoom > MAX_THUMBNAIL_SIZE) {
-                zoom = MAX_THUMBNAIL_SIZE;
-            }
 
-            if (Properties.Settings.Default.Zoom == zoom) {
+        public const int MAX_SAVE_SPLITTER_DISTANCE = 256;
+        private void splitContainer1_SplitterMoved(object sender, SplitterEventArgs e)
+        {
+            ReloadDocumentThumbnails();
+
+            if (isResizing) {
                 return;
             }
 
-
-            Properties.Settings.Default.Zoom = zoom;
+            var d = splitContainer1.SplitterDistance;
+            if (d > MAX_SAVE_SPLITTER_DISTANCE) {
+                d = MAX_SAVE_SPLITTER_DISTANCE;
+            }
+            Properties.Settings.Default.SplitterDistance = d;
             Properties.Settings.Default.Save();
-            ReloadDocumentThumbnails();
+
         }
 
-        private void zoomOutToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            int zoom = Properties.Settings.Default.Zoom;
-            zoom -= 32;
-            if (zoom < MIN_THUMBNAIL_SIZE) {
-                zoom = MIN_THUMBNAIL_SIZE;
-            }
-
-            if (Properties.Settings.Default.Zoom == zoom) {
-                return;
-            }
-
-            Properties.Settings.Default.Zoom = zoom;
-            Properties.Settings.Default.Save();
-            ReloadDocumentThumbnails();
-        }
     }
 }

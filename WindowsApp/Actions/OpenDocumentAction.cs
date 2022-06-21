@@ -30,6 +30,7 @@ namespace PaperPlane2.Actions
         {
             form.Workspace.OpenDocument(document);
             form.ReloadHasDocument();
+            form.ReloadPagePreview();
             form.ReloadDocumentThumbnails();
         }
 
@@ -37,6 +38,7 @@ namespace PaperPlane2.Actions
         {
             form.Workspace.OpenDocument(lastDocument);
             form.ReloadHasDocument();
+            form.ReloadPagePreview();
             form.ReloadDocumentThumbnails();
         }
     }

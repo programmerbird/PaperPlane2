@@ -26,6 +26,8 @@ namespace PaperPlane2.Actions
             foreach (var page in pages) {
                 page.Rotate(degree);
             }
+
+            form.ReloadPagePreview();
             form.ReloadDocumentThumbnails();
         }
 
@@ -40,6 +42,7 @@ namespace PaperPlane2.Actions
                 page.Rotate(-degree);
             }
 
+            form.ReloadPagePreview();
             form.ReloadDocumentThumbnails();
         }
     }
