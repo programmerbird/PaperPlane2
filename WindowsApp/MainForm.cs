@@ -79,11 +79,6 @@ namespace PaperPlane2
         }
 
 
-        public void ClearDocumentThumbnails() {
-            listView1.Clear();
-            listView1.LargeImageList = null;
-        }
-
 
         private int reloadThumbnailsVersion = 0;
         public void ReloadDocumentThumbnails() {
@@ -97,6 +92,7 @@ namespace PaperPlane2
 
         private const int MAX_THUMBNAIL_SIZE = 256;
         private const int MIN_THUMBNAIL_SIZE = 64;
+        private const int FAST_THUMBNAIL_SIZE = 32;
         private void ReloadThumbnailsInBackground() {
 
             int thumbnailSize = (splitContainer1.SplitterDistance - 20) * 8 / 10;
@@ -120,8 +116,14 @@ namespace PaperPlane2
 
             int fullScore = pages.Count * 2 + 5;
             int score = 0;
+
+            bool hasFastThumbnail = false;
             foreach (var page in pages) {
-                var image = Workspace.GetPageFastThumbnailImage(page, thumbnailSize);
+                var image = Workspace.GetCachePageThumbnailImage(page, thumbnailSize);
+                if (image == null) {
+                    image = Workspace.GetPageThumbnailImage(page, FAST_THUMBNAIL_SIZE);
+                    hasFastThumbnail = true;
+                }
                 smallImageList.Images.Add(page.FileName, image);
                 score += 1;
                 backgroundWorker1.ReportProgress(score * 100 / fullScore);
@@ -132,6 +134,10 @@ namespace PaperPlane2
                 SetImageList(smallImageList, pages);
             });
 
+            if (!hasFastThumbnail) {
+                backgroundWorker1.ReportProgress(100);
+                return;
+            }
 
             var largeImageList = new ImageList();
             largeImageList.ImageSize = new Size(thumbnailSize, thumbnailSize);
@@ -163,33 +169,47 @@ namespace PaperPlane2
         }
         private void SetImageList(ImageList imageList, List<PDFDocument> pages) {
 
+            var offset = listView1.AutoScrollOffset;
+            var selectedPages = ListSelectedPages();
+
             this.isReloadingListView += 1;
-            try
-            {
-                var selectedPages = ListSelectedPages();
+            listView1.BeginUpdate();
+
+            ListViewItem? firstSelectedItemView = null;
+            try {
 
                 listView1.Clear();
                 listView1.LargeImageList = imageList;
 
                 int pageIndex = 0;
-                foreach (var page in pages)
-                {
+                foreach (var page in pages) {
 
                     var itemView = new ListViewItem();
                     itemView.Text = String.Format("{0}", pageIndex + 1);
                     itemView.ImageKey = page.FileName;
                     listView1.Items.Add(itemView);
 
-                    if (selectedPages.Contains(page))
-                    {
+                    if (selectedPages.Contains(page)) {
                         itemView.Selected = true;
+                        if (firstSelectedItemView == null) {
+                            firstSelectedItemView = itemView;
+                        }
                     }
                     pageIndex += 1;
                 }
+
             }
             finally {
+                listView1.EndUpdate();
+                listView1.AutoScrollOffset = offset;
                 this.isReloadingListView -= 1;
+
+                if (firstSelectedItemView != null) {
+                    firstSelectedItemView.EnsureVisible();
+                }
             }
+
+
         }
         private void undoToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -222,12 +242,13 @@ namespace PaperPlane2
             try {
                 webView1.Visible = true;
                 var url = new Uri(string.Format("file://{0}", fileName));
-                if (webView1.Source == url)
-                {
-                    webView1.Reload();
+                System.Diagnostics.Debug.WriteLine("Load:{0}", fileName);
+                if (webView1.Source != url) {
+                    webView1.Source = url;
                 }
                 else {
                     webView1.Source = url;
+                    webView1.Reload();
                 }
                 return true;
             }
@@ -244,21 +265,6 @@ namespace PaperPlane2
             if (firstPage != null) {
                 if (ShowPagePreview(firstPage.FileName)) {
                     return;
-                }
-            }
-
-
-            if (Workspace.Document == null) {
-                ShowPagePreview(null);
-                return;
-            }
-
-            var pages = Workspace.ListDocumentPages();
-            if (pages != null) {
-                foreach (var page in pages) {
-                    if (ShowPagePreview(page.FileName)) {
-                        return;
-                    }
                 }
             }
 
@@ -602,7 +608,12 @@ namespace PaperPlane2
         }
 
         public void SelectPage(int index) {
-            listView1.Items[index].Selected = true;
+            try {
+                listView1.Items[index].Selected = true;
+            }
+            catch (ArgumentOutOfRangeException){ 
+                
+            }
         }
 
         private void selectAllToolStripMenuItem_Click(object sender, EventArgs e) {

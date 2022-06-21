@@ -68,6 +68,7 @@ namespace PaperPlane2.Actions
             }
 
             form.ReloadHasDocument();
+            form.ReloadPagePreview();
             form.ReloadDocumentThumbnails();
         }
 
@@ -88,8 +89,8 @@ namespace PaperPlane2.Actions
             }
 
             form.ReloadHasDocument();
+            form.ReloadPagePreview();
             form.ReloadDocumentThumbnails();
-
 
         }
 

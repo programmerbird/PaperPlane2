@@ -103,15 +103,13 @@ namespace PaperPlane2.Models
             return 512;
         }
 
-        private const int FAST_THUMBNAIL_SIZE = 32;
-        public Image GetPageFastThumbnailImage(PDFDocument page, int size) {
+        public Image? GetCachePageThumbnailImage(PDFDocument page, int size) {
             int actualSize = GetThumbnailActualSize(size);
             string thumbnailPath = GetThumbnailFileName(page, actualSize);
             if (File.Exists(thumbnailPath)) {
                 return Image.FromFile(thumbnailPath);
             }
-
-            return GetPageThumbnailImage(page, FAST_THUMBNAIL_SIZE);
+            return null;
         }
 
         public Image GetPageThumbnailImage(PDFDocument page, int size) {

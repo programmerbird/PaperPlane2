@@ -41,6 +41,7 @@ namespace PaperPlane2.Actions
             }
 
             form.DeselectAll();
+            form.ReloadPagePreview();
             form.ReloadDocumentThumbnails();
         }
 
@@ -65,6 +66,7 @@ namespace PaperPlane2.Actions
                 }
             }
 
+            form.ReloadPagePreview();
             form.ReloadDocumentThumbnails();
 
         }
