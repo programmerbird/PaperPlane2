@@ -14,6 +14,9 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>pdf,merge,rotate,split,reorder</PackageTags>
     <PackageLicenseFile></PackageLicenseFile>
+    <Authors>Sittipon Simasanti</Authors>
+    <Company>Apisith Interplast</Company>
+    <Product>Paper Plane</Product>
   </PropertyGroup>
 
   <ItemGroup>
