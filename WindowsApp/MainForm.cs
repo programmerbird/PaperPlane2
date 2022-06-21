@@ -10,11 +10,18 @@ namespace PaperPlane2
 
         public Workspace Workspace; 
 
-        public MainForm()
+        public MainForm(string? openFileName)
         {
+
             string tempPath = Path.Combine(Path.GetTempPath(), "PaperPlane");
             if (Directory.Exists(tempPath)) {
-                Directory.Delete(tempPath, true);
+                try
+                {
+                    Directory.Delete(tempPath, true);
+                }
+                catch (Exception) { 
+
+                }
             }
 
             Workspace = new Workspace(tempPath);
@@ -22,6 +29,10 @@ namespace PaperPlane2
             UndoStacks = new List<DocumentAction>();
             RedoStacks = new List<DocumentAction>();
             InitializeComponent();
+
+            if (openFileName != null) {
+                ExecuteAction(new OpenDocumentAction(openFileName));
+            }
         }
 
         public void ExecuteAction(DocumentAction action) {
@@ -75,7 +86,6 @@ namespace PaperPlane2
         {
             splitContainer1.SplitterDistance = Properties.Settings.Default.SplitterDistance;
 
-            // ExecuteAction(new OpenDocumentAction("C:\\Users\\Sittipon\\Projects\\PaperPlane2\\Assets\\Test.pdf"));
         }
 
 
