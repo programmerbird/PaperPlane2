@@ -13,21 +13,13 @@ namespace PaperPlane2
         public MainForm(string? openFileName)
         {
 
-            string tempPath = Path.Combine(Path.GetTempPath(), "PaperPlane");
-            if (Directory.Exists(tempPath)) {
-                try
-                {
-                    Directory.Delete(tempPath, true);
-                }
-                catch (Exception) { 
-
-                }
-            }
-
-            Workspace = new Workspace(tempPath);
 
             UndoStacks = new List<DocumentAction>();
             RedoStacks = new List<DocumentAction>();
+
+            string tempPath = Path.Combine(Path.GetTempPath(), "PaperPlane", Guid.NewGuid().ToString("N"));
+            Workspace = new Workspace(tempPath);
+
             InitializeComponent();
 
             if (openFileName != null) {
@@ -756,5 +748,15 @@ namespace PaperPlane2
 
         }
 
+        private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            if (Workspace != null) {
+                try {
+                    Workspace.DeleteRootDirectory();
+                }
+                catch { 
+                }
+            }
+        }
     }
 }

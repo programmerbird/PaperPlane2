@@ -20,16 +20,24 @@ namespace PaperPlane2.Models
 
 
 
+
         public Workspace(string root) {
             this.Root = root;
             this.pages = null;
             this.exportThumbnails = new Dictionary<string, bool>();
-
         }
 
 
-        public void OpenDocument(PDFDocument? document) {
+        public void DeleteRootDirectory() {
+            if (Directory.Exists(this.Root)) {
+                Directory.Delete(this.Root, true);
+            }
+        }
 
+        public void OpenDocument(PDFDocument? document) {
+            if (!Directory.Exists(this.Root)) {
+                Directory.CreateDirectory(this.Root);
+            }
             this.Document = document;
             this.pages = null;
         }
